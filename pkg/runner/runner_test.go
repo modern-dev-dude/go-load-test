@@ -13,6 +13,8 @@ func getOpts() *cli.RunnerOptions {
 	return &cli.RunnerOptions{
 		Endpoint:     "http://test.com",
 		NumberOfTest: 3,
+		// 1ms so it fails quickly for test
+		Timeout: 1,
 	}
 }
 

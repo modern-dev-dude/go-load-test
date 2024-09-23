@@ -1,10 +1,13 @@
 package cli
 
-import "github.com/hellflame/argparse"
+import (
+	"github.com/hellflame/argparse"
+)
 
 type RunnerOptions struct {
 	Endpoint     string
 	NumberOfTest int
+	Timeout      int
 }
 
 func GetOptions() (*RunnerOptions, error) {
@@ -20,6 +23,11 @@ func GetOptions() (*RunnerOptions, error) {
 		Required: true,
 	})
 
+	timeout := parser.Int("to", "timeout", &argparse.Option{
+		Required: false,
+		Default:  "5000",
+	})
+
 	err := parser.Parse(nil)
 	if err != nil {
 		return nil, err
@@ -28,5 +36,6 @@ func GetOptions() (*RunnerOptions, error) {
 	return &RunnerOptions{
 		Endpoint:     *endpoint,
 		NumberOfTest: *numberOfTest,
+		Timeout:      *timeout,
 	}, nil
 }
