@@ -49,6 +49,12 @@ func processApiRequest(runnerOptions *cli.RunnerOptions) *RunnerResultChannel {
 		}
 	}
 
+	if res != nil {
+		defer func() {
+			res.Body.Close()
+		}()
+	}
+
 	return &RunnerResultChannel{
 		Response: res,
 		Error:    nil,
