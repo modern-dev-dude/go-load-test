@@ -1,13 +1,11 @@
 package runner
 
 import (
+	"fmt"
 	"io"
 	"log"
 	"net/http"
 	"runner/pkg/cli"
-	"time"
-
-	"github.com/google/uuid"
 )
 
 func Start() {
@@ -35,50 +33,34 @@ func getDefaultSettings() *RunnerSettings {
 }
 
 func RunDesiredNumberOfTest(runnerOptions *cli.RunnerOptions) {
-	// leaving here until unit test are updated for concurrent req
-	count := 1
-	successCount := 0
-	errorCount := 0
-	// request, err := http.NewRequest("GET", runnerOptions.Endpoint, nil)
-	// if err != nil {
-	// 	log.Printf("err: %v \n", err)
-	// }
-
-	// request.Header.Set("Content-Type", "application/json")
-	client := &http.Client{
-		Timeout: time.Duration(runnerOptions.Timeout) * time.Second,
-	}
-
-	settings := getDefaultSettings()
+	jobs := make(chan *cli.RunnerOptions, runnerOptions.NumberOfTest)
+	results := make(chan *RunnerResultChannel, runnerOptions.NumberOfTest)
+	fmt.Printf("runnerOptions: %+v\n", runnerOptions)
+	WorkerPool(runnerOptions.Connections, jobs, results)
 
 	for i := 0; i < runnerOptions.NumberOfTest; i++ {
-		reqId := uuid.New()
+		jobs <- runnerOptions
+	}
+	close(jobs)
 
-		log.Println("sending req id: ", reqId.String())
-		req, err := http.NewRequest(settings.Method, runnerOptions.Endpoint, settings.Body)
-		req.Header.Set("Content-Type", settings.ContentType)
+	errorCount := 0
+	successCount := 0
 
-		res, err := client.Do(req)
-		if err != nil {
-			log.Fatal(err)
+	// collect results
+	for i := 0; i < runnerOptions.NumberOfTest; i++ {
+		result := <-results
+		// handle errors
+		if result.Error != nil {
 			errorCount++
 		}
 
-		defer func() {
-			if res != nil {
-				log.Println("successful req id: ", reqId.String())
-
-				if res.Status == string(http.StatusOK) {
-					successCount++
-				}
+		if result.Response != nil {
+			if result.Response.StatusCode == http.StatusOK {
+				successCount++
 			}
-		}()
-
-		if err != nil {
-			log.Printf("err: %v \n", err)
 		}
-
-		log.Printf("number of test ran: %v \n", count)
-		count++
 	}
+
+	fmt.Printf("\nSuccesses :%v\n", successCount)
+	fmt.Printf("\nErrors :%v\n", errorCount)
 }

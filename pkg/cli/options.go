@@ -8,6 +8,7 @@ type RunnerOptions struct {
 	Endpoint     string
 	NumberOfTest int
 	Timeout      int
+	Connections  int
 }
 
 func GetOptions() (*RunnerOptions, error) {
@@ -28,6 +29,11 @@ func GetOptions() (*RunnerOptions, error) {
 		Default:  "5",
 	})
 
+	connections := parser.Int("c", "connections", &argparse.Option{
+		Required: false,
+		Default:  "5",
+	})
+
 	err := parser.Parse(nil)
 	if err != nil {
 		return nil, err
@@ -37,5 +43,6 @@ func GetOptions() (*RunnerOptions, error) {
 		Endpoint:     *endpoint,
 		NumberOfTest: *numberOfTest,
 		Timeout:      *timeout,
+		Connections:  *connections,
 	}, nil
 }
