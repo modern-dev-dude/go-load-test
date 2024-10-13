@@ -25,7 +25,7 @@ func GetOptions() (*RunnerOptions, error) {
 
 	timeout := parser.Int("to", "timeout", &argparse.Option{
 		Required: false,
-		Default:  "5000",
+		Default:  "5",
 	})
 
 	err := parser.Parse(nil)
