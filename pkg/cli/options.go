@@ -9,6 +9,7 @@ type RunnerOptions struct {
 	NumberOfTest int
 	Timeout      int
 	Connections  int
+	Headers      []string
 }
 
 func GetOptions() (*RunnerOptions, error) {
@@ -34,6 +35,14 @@ func GetOptions() (*RunnerOptions, error) {
 		Default:  "5",
 	})
 
+	headers := parser.Strings("he", "headers", &argparse.Option{
+		Required: false,
+	})
+
+	if headers == nil {
+		headers = &[]string{}
+	}
+
 	err := parser.Parse(nil)
 	if err != nil {
 		return nil, err
@@ -44,5 +53,6 @@ func GetOptions() (*RunnerOptions, error) {
 		NumberOfTest: *numberOfTest,
 		Timeout:      *timeout,
 		Connections:  *connections,
+		Headers:      *headers,
 	}, nil
 }
