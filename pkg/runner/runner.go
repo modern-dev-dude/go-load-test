@@ -21,14 +21,12 @@ func Start() {
 }
 
 type RunnerSettings struct {
-	Method      string
 	ContentType string
 	Body        io.Reader
 }
 
 func getDefaultSettings() *RunnerSettings {
 	return &RunnerSettings{
-		Method:      "GET",
 		ContentType: "application/json",
 		Body:        nil,
 	}

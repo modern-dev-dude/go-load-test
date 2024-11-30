@@ -1,6 +1,8 @@
 package cli
 
 import (
+	"net/http"
+
 	"github.com/hellflame/argparse"
 )
 
@@ -10,6 +12,7 @@ type RunnerOptions struct {
 	Timeout      int
 	Connections  int
 	Headers      []string
+	Method       string
 }
 
 func GetOptions() (*RunnerOptions, error) {
@@ -39,6 +42,10 @@ func GetOptions() (*RunnerOptions, error) {
 		Required: false,
 	})
 
+	method := parser.String("m", "method", &argparse.Option{
+		Required: false,
+		Default:  http.MethodGet,
+	})
 	if headers == nil {
 		headers = &[]string{}
 	}
@@ -54,5 +61,6 @@ func GetOptions() (*RunnerOptions, error) {
 		Timeout:      *timeout,
 		Connections:  *connections,
 		Headers:      *headers,
+		Method:       *method,
 	}, nil
 }

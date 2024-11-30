@@ -39,7 +39,7 @@ func processApiRequest(runnerOptions *cli.RunnerOptions) *RunnerResultChannel {
 	reqId := uuid.New()
 
 	log.Println("sending req id: ", reqId.String())
-	req, err := http.NewRequest(settings.Method, runnerOptions.Endpoint, settings.Body)
+	req, err := http.NewRequest(runnerOptions.Method, runnerOptions.Endpoint, settings.Body)
 	if err != nil {
 		return &RunnerResultChannel{
 			Response:      nil,
@@ -50,11 +50,12 @@ func processApiRequest(runnerOptions *cli.RunnerOptions) *RunnerResultChannel {
 	req.Header.Set("Content-Type", settings.ContentType)
 	setHeaders(req, &runnerOptions.Headers)
 
+	currentTime := time.Now()
 	res, err := client.Do(req)
 	if err != nil || res == nil {
 		return &RunnerResultChannel{
 			Response:      nil,
-			ExecutionTime: timer(time.Now()),
+			ExecutionTime: timer(currentTime),
 			Error:         err,
 		}
 	}
@@ -67,7 +68,7 @@ func processApiRequest(runnerOptions *cli.RunnerOptions) *RunnerResultChannel {
 
 	return &RunnerResultChannel{
 		Response:      res,
-		ExecutionTime: timer(time.Now()),
+		ExecutionTime: timer(currentTime),
 		Error:         nil,
 	}
 }
